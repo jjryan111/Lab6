@@ -18,6 +18,7 @@ namespace Lab6a
 
             char[] vowelArray = { 'a', 'e', 'i', 'o', 'u','A','E','I','O','U' };
             char[] specArray = { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')' };
+            char[] punctArray = { ',', '.', '/', '?', '<', '>', '-', '_', '+', '=', ':', ';' };
             string yesNo = "y";
             while (yesNo == "y")
             {
@@ -34,21 +35,26 @@ namespace Lab6a
             string firstChars = "";
             char[] lookIn = cword.ToArray();
             int wordLength = lookIn.Length;
+            bool firstVow = false;
             foreach (char i in cword)
             {
+                if (firstVow)
+                {
+                    break;
+                }
                 foreach(char j in varray)
                 {
                     if (i == j)
                     {
                         cword = cword + firstChars;
                         Console.Write(cword+"ay ");
+                        firstVow = true;
                         break;
                     }
                 }
                 firstChars = firstChars + i;
                 cword = cword.Substring(1);
             }
-
         }
 
         public static void PrintSpec(string specWord)
@@ -66,33 +72,44 @@ namespace Lab6a
             foreach (string i in inputToPrint)
             {
                 bool spec = false;
-                bool vowel = false;
-
+                    bool punct, vowel = false;
+                float thing = 0;
                 char[] newWord = i.ToCharArray();
-                for (int j = 0; j < sarray.Length; j++)
+                bool num = float.TryParse(i, out thing);
+                if (num)
                 {
-                    if (i.IndexOf(sarray[j]) != -1)
-                    {
-                        PrintSpec(i);
-                        spec = true;
-                    }
+                    PrintSpec(i);
                 }
-                if (!spec)
+                else if (!num)
+                {
+
+                    foreach (char j in sarray)
                     {
-                        foreach (char k in varray)
+                        if (i.IndexOf(j) != -1)
                         {
-                            if (newWord[0] == k)
-                            {
-                                PrintVowelFirst(i);
-                                vowel = true;
-                            }
+                            PrintSpec(i);
+                            spec = true;
                         }
                     }
+                }
 
-                    if (!spec && !vowel)
+                else if (!spec && !num)
                     {
-                        findVowel(i, varray);
+                    foreach (char k in varray)
+                    {
+                        if (newWord[0] == k)
+                        {
+                            PrintVowelFirst(i);
+                            vowel = true;
+                        }
                     }
+                    
+                }
+
+                if (!num && !spec && !vowel)
+                {
+                    findVowel(i, varray);
+                }
             }
         }
         public static string ynInput()
