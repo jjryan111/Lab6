@@ -11,73 +11,112 @@ namespace Lab6a
 
         static void Main(string[] args)
         {
-            char[] vowelArray = {'a','e','i','o','u' };
-            int strLength = 0;
+
+            // Pig Latin Rules
+            //Starts w/vowel + "way"
+            // Starts w/consonant chop off first letter, add it to the end + "ay"
+
+            char[] vowelArray = { 'a', 'e', 'i', 'o', 'u','A','E','I','O','U' };
+            char[] specArray = { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')' };
             string yesNo = "y";
             while (yesNo == "y")
             {
 
                 string inputString = GetInputString("Enter the text to be translated: ");
-                inputString = inputString.TrimEnd('?', '.', ',');
+//                inputString = inputString.TrimEnd('?', '.', ',');
                 string[] words = inputString.Split(' ');
-                PrintArray(words,vowelArray);
+                PrintArray(words, vowelArray,specArray);
                 yesNo = ynInput();
             }
         }
-
-    public static void PrintArray(string [] inputToPrint, char[]varray)
-    {
-       // foreach (string i in inputToPrint)
-       for (int i=0;i<inputToPrint.Length;i++)
+        public static void findVowel(string cword, char [] varray)
         {
-                bool vowel = false;
-                char [] newWord = inputToPrint[i].ToCharArray();
-                //               Console.WriteLine(newWord[0]);
-
-                for (int l=0; l< varray.Length;l++)
+            string firstChars = "";
+            char[] lookIn = cword.ToArray();
+            int wordLength = lookIn.Length;
+            foreach (char i in cword)
+            {
+                foreach(char j in varray)
                 {
-                    if (newWord[0].Equals(varray[l]))
+                    if (i == j)
                     {
-                        vowel = true;
+                        cword = cword + firstChars;
+                        Console.Write(cword+"ay ");
+                        break;
                     }
                 }
-                if (vowel)
+                firstChars = firstChars + i;
+                cword = cword.Substring(1);
+            }
+
+        }
+
+        public static void PrintSpec(string specWord)
+        {
+            Console.Write(specWord + " ");
+        }
+
+        public static void PrintVowelFirst(string vowelWord)
+        {
+            Console.Write(vowelWord + "way ");
+        }
+
+        public static void PrintArray(string[] inputToPrint, char[] varray, char[] sarray)
+        {
+            foreach (string i in inputToPrint)
+            {
+                bool spec = false;
+                bool vowel = false;
+
+                char[] newWord = i.ToCharArray();
+                for (int j = 0; j < sarray.Length; j++)
                 {
-                    Console.Write(inputToPrint[i]+"ay ");
+                    if (i.IndexOf(sarray[j]) != -1)
+                    {
+                        PrintSpec(i);
+                        spec = true;
+                    }
+                }
+                if (!spec)
+                    {
+                        foreach (char k in varray)
+                        {
+                            if (newWord[0] == k)
+                            {
+                                PrintVowelFirst(i);
+                                vowel = true;
+                            }
+                        }
+                    }
+
+                    if (!spec && !vowel)
+                    {
+                        findVowel(i, varray);
+                    }
+            }
+        }
+        public static string ynInput()
+        {
+            string input = "";
+            bool invalid = true;
+            while (invalid)
+            {
+                Console.WriteLine("");
+                Console.WriteLine("Continue? (y/n): ");
+                input = Console.ReadLine();
+                input = input.ToLower();
+                if (input == "y" || input == "n")
+                {
+                    invalid = false;
                 }
                 else
                 {
-                    char[] nvArray = inputToPrint[i].ToArray();
-                    for (int m = 1; m < nvArray.Length; m++)
-                    {
-                        Console.Write(nvArray[m]);
-                    }
-                    Console.Write(nvArray[0]+"ay ");
+                    Console.WriteLine("Please enter y or n.");
                 }
-        }
-    }
-    public static string ynInput()
-    {
-        string input = "";
-        bool invalid = true;
-        while (invalid)
-        {
-            Console.WriteLine("");
-            Console.WriteLine("Continue? (y/n): ");
-            input = Console.ReadLine();
-//            input = input.ToLower;
-            if (input == "y" || input == "n")
-            {
-                invalid = false;
             }
-            else
-            {
-                Console.WriteLine("Please enter y or n.");
-            }
-        }
 
-        return input;
-    }
+            return input;
+        }
         public static string GetInputString(string question)
         {
             bool input = false;
