@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -30,6 +30,29 @@ namespace Lab6a
                 yesNo = ynInput();
             }
         }
+        public static char FindPunct(string word, char[] parray)
+        {
+            char [] pword = word.ToArray();
+            int len = pword.Length -1;
+            char punct="";
+            bool done = false;
+            
+            foreach (char a in parray)
+            {
+                 if (pword[len] == a && !done)
+                 {
+                      punct =a;
+                      word = word.Trim(a);
+                      done = true;
+                 }
+                 else if (pword[len] == a)
+                 {
+                      Console.WriteLine("\n Throw me a bone here. you can't have two punctuation marks in a row!");
+                 }
+            }
+            return punct;
+        }
+        
         public static void findVowel(string cword, char [] varray)
         {
             string firstChars = "";
@@ -73,6 +96,7 @@ namespace Lab6a
             {
                 bool spec = false;
                     bool punct, vowel = false;
+                    char pun = FindPunct(i);
                 float thing = 0;
                 char[] newWord = i.ToCharArray();
                 bool num = float.TryParse(i, out thing);
