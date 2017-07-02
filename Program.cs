@@ -13,8 +13,10 @@ namespace Lab6a
         {
 
             // Pig Latin Rules
-            //Starts w/vowel + "way"
-            // Starts w/consonant chop off first letter, add it to the end + "ay"
+            // Starts w/vowel = word+ "way"
+            // Starts w/consonant chop off letters until vowel, add chopped off letters to the end + "ay"
+            // Keep punctuation
+            // Allow for numbers & special characters
 
             char[] vowelArray = { 'a', 'e', 'i', 'o', 'u','A','E','I','O','U' };
             char[] specArray = { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')' };
@@ -22,11 +24,9 @@ namespace Lab6a
             string yesNo = "y";
             while (yesNo == "y")
             {
-
                 string inputString = GetInputString("Enter the text to be translated: ");
-//                inputString = inputString.TrimEnd('?', '.', ',');
                 string[] words = inputString.Split(' ');
-                PrintArray(words, vowelArray,specArray);
+                PrintPig(words, vowelArray,specArray, punctArray);
                 yesNo = ynInput();
             }
         }
@@ -34,45 +34,48 @@ namespace Lab6a
         {
             char [] pword = word.ToArray();
             int len = pword.Length -1;
-            char punct="";
+            char punct='a';
             bool done = false;
             
             foreach (char a in parray)
             {
                  if (pword[len] == a && !done)
                  {
-                      punct =a;
+                      punct = a;
                       word = word.Trim(a);
                       done = true;
-                 }
-                 else if (pword[len] == a)
-                 {
-                      Console.WriteLine("\n Throw me a bone here. you can't have two punctuation marks in a row!");
                  }
             }
             return punct;
         }
         
-        public static void findVowel(string cword, char [] varray)
+        public static void FindVowel(string cword, char [] varray, char p)
         {
             string firstChars = "";
-            char[] lookIn = cword.ToArray();
-            int wordLength = lookIn.Length;
             bool firstVow = false;
             foreach (char i in cword)
             {
-                if (firstVow)
+                if (!firstVow)
                 {
-                    break;
-                }
-                foreach(char j in varray)
-                {
-                    if (i == j)
+
+                    foreach (char j in varray)
                     {
-                        cword = cword + firstChars;
-                        Console.Write(cword+"ay ");
-                        firstVow = true;
-                        break;
+                        if (!firstVow)
+                        {
+                            if (i == j)
+                            {
+                                cword = cword + firstChars;
+                                if (p != 'a')
+                                {
+                                    Console.Write(cword + "ay" + p + " ");
+                                }
+                                else
+                                {
+                                    Console.Write(cword + "ay ");
+                                }
+                                firstVow = true;
+                            }
+                        }
                     }
                 }
                 firstChars = firstChars + i;
@@ -85,18 +88,27 @@ namespace Lab6a
             Console.Write(specWord + " ");
         }
 
-        public static void PrintVowelFirst(string vowelWord)
+        public static void PrintVowelFirst(string vowelWord, char p)
         {
-            Console.Write(vowelWord + "way ");
+            if (p != 'a')
+            {
+                Console.Write(vowelWord+"way"+p+" ");
+            }
+            else
+            {
+                Console.Write(vowelWord + "way ");
+            }
         }
 
-        public static void PrintArray(string[] inputToPrint, char[] varray, char[] sarray)
+        public static void PrintPig(string[] inputToPrint, char[] varray, char[] sarray, char [] parray)
         {
             foreach (string i in inputToPrint)
             {
                 bool spec = false;
-                    bool punct, vowel = false;
-                    char pun = FindPunct(i);
+                bool vowel = false;
+                bool punct = false;
+                char pun = 'a';
+                string m = "";    
                 float thing = 0;
                 char[] newWord = i.ToCharArray();
                 bool num = float.TryParse(i, out thing);
@@ -106,12 +118,21 @@ namespace Lab6a
                 }
                 else if (!num)
                 {
-
+                    pun = FindPunct(i, parray);
+                    if (pun != 'a')
+                    {
+                        m = i.TrimEnd(pun);
+                        punct = true;
+                    }
+                    else
+                    {
+                        m = i;
+                    }
                     foreach (char j in sarray)
                     {
-                        if (i.IndexOf(j) != -1)
+                        if (m.IndexOf(j) != -1)
                         {
-                            PrintSpec(i);
+                            PrintSpec(m);
                             spec = true;
                         }
                     }
@@ -123,7 +144,7 @@ namespace Lab6a
                     {
                         if (newWord[0] == k)
                         {
-                            PrintVowelFirst(i);
+                            PrintVowelFirst(m, pun);
                             vowel = true;
                         }
                     }
@@ -132,7 +153,7 @@ namespace Lab6a
 
                 if (!num && !spec && !vowel)
                 {
-                    findVowel(i, varray);
+                    FindVowel(m, varray, pun);
                 }
             }
         }
@@ -155,9 +176,9 @@ namespace Lab6a
                     Console.WriteLine("Please enter y or n.");
                 }
             }
-
             return input;
         }
+
         public static string GetInputString(string question)
         {
             bool input = false;
