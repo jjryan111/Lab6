@@ -1,57 +1,57 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lab6a
 {
     class Program
     {
 
-        static void Main(string[] args)
+        static void Main()
         {
-
             // Pig Latin Rules
             // Starts w/vowel = word+ "way"
             // Starts w/consonant chop off letters until vowel, add chopped off letters to the end + "ay"
             // Keep punctuation
-            // Allow for numbers & special characters
-
+            // Allow for contractions, numbers & special characters
+            // Keep word case
             char[] vowelArray = { 'a', 'e', 'i', 'o', 'u','A','E','I','O','U' };
             char[] specArray = { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')' };
             char[] punctArray = { ',', '.', '/', '?', '<', '>', '-', '_', '+', '=', ':', ';' };
             string yesNo = "y";
             while (yesNo == "y")
             {
+                Console.Clear();
+                Console.WriteLine("Welcome to the Pig Latin translator!\n");
                 string inputString = GetInputString("Enter the text to be translated: ");
+                inputString = inputString.Trim(); // Trailing spaces cause weird things to happen.
                 string[] words = inputString.Split(' ');
-                PrintPig(words, vowelArray,specArray, punctArray);
+                Console.WriteLine();
+                ClassifyWord(words, vowelArray,specArray, punctArray);
                 yesNo = ynInput();
             }
         }
+
         public static char FindPunct(string word, char[] parray)
+        // Finds the last puctuation mark after any word. 
         {
             char [] pword = word.ToArray();
-            int len = pword.Length -1;
             char punct='a';
-            bool done = false;
             
             foreach (char a in parray)
             {
-                 if (pword[len] == a && !done)
+                 if (pword[(pword.Length - 1)] == a)
                  {
                       punct = a;
-                      word = word.Trim(a);
-                      done = true;
                  }
             }
             return punct;
         }
-        
-        public static void FindVowel(string cword, char [] varray, char p)
+
+        public static void Translate(string cword, char [] varray, char p)
+        // Translates the word into Pig Latin
         {
             string firstChars = "";
+            string initWord = cword;
             bool firstVow = false;
             foreach (char i in cword)
             {
@@ -67,62 +67,78 @@ namespace Lab6a
                                 cword = cword + firstChars;
                                 if (p != 'a')
                                 {
-                                    Console.Write(cword + "ay" + p + " ");
+                                    if (initWord == cword) //The word started with a vowel and there was punctuation.
+                                    {
+                                       cword = cword + "way" + p;
+                                        PrintIt(cword);
+                                    }
+                                    else //The word started with one or more consonants and there was punctuation.
+                                    {
+                                        cword = cword + "ay" + p;
+                                        PrintIt(cword);
+                                    }
                                 }
                                 else
                                 {
-                                    Console.Write(cword + "ay ");
+                                    if (initWord == cword) //The word started with a vowel.
+                                    {
+                                        cword = cword + "way";
+                                        PrintIt(cword);
+                                    }
+                                    else  //The word started with one or more consonants.
+                                    {
+                                        cword = cword + "ay"; 
+                                        PrintIt(cword);
+                                    }
+
                                 }
                                 firstVow = true;
                             }
                         }
                     }
                 }
-                firstChars = firstChars + i;
-                cword = cword.Substring(1);
+                firstChars = firstChars + i; // Add the indexed letter to the string of characters to save.
+                cword = cword.Substring(1); // Chop that letter off the word.
             }
-        }
-
-        public static void PrintSpec(string specWord)
-        {
-            Console.Write(specWord + " ");
-        }
-
-        public static void PrintVowelFirst(string vowelWord, char p)
-        {
-            if (p != 'a')
+            if (firstVow == false) // Otherwise the word doesnt have a vowel in it.
             {
-                Console.Write(vowelWord+"way"+p+" ");
-            }
-            else
-            {
-                Console.Write(vowelWord + "way ");
+                if (p !='a')
+                {
+                    PrintIt(firstChars + "ay" +p);
+                }
+                else
+                {
+                    PrintIt(firstChars + "ay");
+                }
             }
         }
 
-        public static void PrintPig(string[] inputToPrint, char[] varray, char[] sarray, char [] parray)
+        public static void PrintIt(string word)
+        {
+            Console.Write(word + " ");
+        }
+
+        public static void ClassifyWord(string[] inputToPrint, char[] varray, char[] sarray, char[] parray)
+        // Determines whether a word needs to be translated or not.
         {
             foreach (string i in inputToPrint)
             {
                 bool spec = false;
-                bool vowel = false;
-                bool punct = false;
                 char pun = 'a';
-                string m = "";    
+                string m = "";
                 float thing = 0;
                 char[] newWord = i.ToCharArray();
                 bool num = float.TryParse(i, out thing);
                 if (num)
                 {
-                    PrintSpec(i);
+                    PrintIt(i); //The word was a number. Ignore it.
                 }
                 else if (!num)
                 {
-                    pun = FindPunct(i, parray);
+                    pun = FindPunct(i, parray); //Is there punctuation?
                     if (pun != 'a')
                     {
                         m = i.TrimEnd(pun);
-                        punct = true;
                     }
                     else
                     {
@@ -132,39 +148,26 @@ namespace Lab6a
                     {
                         if (m.IndexOf(j) != -1)
                         {
-                            PrintSpec(m);
+                            PrintIt(m); //The word had special characters in it. Ignore it.
                             spec = true;
                         }
                     }
                 }
-
-                else if (!spec && !num)
-                    {
-                    foreach (char k in varray)
-                    {
-                        if (newWord[0] == k)
-                        {
-                            PrintVowelFirst(m, pun);
-                            vowel = true;
-                        }
-                    }
-                    
-                }
-
-                if (!num && !spec && !vowel)
+                if (!num && !spec) //The word needs translation!
                 {
-                    FindVowel(m, varray, pun);
+                    Translate(m, varray, pun);
                 }
             }
         }
+
         public static string ynInput()
+        // Gets a y or n.
         {
             string input = "";
             bool invalid = true;
             while (invalid)
             {
-                Console.WriteLine("");
-                Console.WriteLine("Continue? (y/n): ");
+                Console.Write("\n\nTranslate another line? (y/n): ");
                 input = Console.ReadLine();
                 input = input.ToLower();
                 if (input == "y" || input == "n")
@@ -173,7 +176,7 @@ namespace Lab6a
                 }
                 else
                 {
-                    Console.WriteLine("Please enter y or n.");
+                    Console.WriteLine("\nPlease enter y or n.");
                 }
             }
             return input;
@@ -189,7 +192,7 @@ namespace Lab6a
                 exitString = Console.ReadLine();
                 if (exitString == "")
                 {
-                    Console.WriteLine("That's not valid input!");
+                    Console.WriteLine("\nPlease enter some text.\n");
                 }
                 else
                 {
