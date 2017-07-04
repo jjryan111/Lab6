@@ -15,8 +15,8 @@ namespace Lab6a
             // Allow for contractions, numbers & special characters
             // Keep word case
             char[] vowelArray = { 'a', 'e', 'i', 'o', 'u', 'A', 'E', 'I', 'O', 'U' };
-            char[] specArray = { '!', '@', '#', '$', '%', '^', '&', '*', '(', ')' };
-            char[] punctArray = { ',', '.', '/', '?', '<', '>', '-', '_', '+', '=', ':', ';' };
+            char[] specArray = {'@', '#', '$', '%', '^', '&', '*', '(', ')' };
+            char[] punctArray = { ',', '.', '/', '?', '<', '>', '-', '_', '+', '=', ':', ';','!'};
             string yesNo = "y";
             while (yesNo == "y")
             {
